@@ -113,12 +113,31 @@ biopython
 bs4
 ```
 
+Cut is super useful for parsing tabular data:
+
+```
+$ cut -d "," -f 2,4 MOCK_DATA.csv
+first_name,email
+Franciska,felcocks0@cnn.com
+Jock,jczaple1@bloglines.com
+Joann,jsussans2@time.com
+Sascha,scaswell3@hhs.gov
+Libby,ltunn4@ucla.edu
+Hamish,hstirman5@blogtalkradio.com
+Sloan,sbasnall6@foxnews.com
+Holly,hlidstone7@behance.net
+Mavra,mtimmins8@wikispaces.com
+Cozmo,ckopman9@privacy.gov.au
+```
+
 Perl for nice regex engine
 
 ```
 $ echo smb://servername.domain.com/sharename | perl -pe 's/.*\/(.*)$/\1/g'
 sharename
 ```
+
+And cannot miss `sort` and `uniq`!
 
 ## Unix tricks
 
@@ -131,6 +150,40 @@ Repeating stuff: `!!`, `!int` or use `history` command
 Mostly I use `Ctrl + R` though which lets you do a "reverse-i-search" (use type ahead on your command history)
 
 For zsh I configured unlimited history, see [here](https://unix.stackexchange.com/questions/273861/unlimited-history-in-zsh)
+
+Killing processes:
+
+```
+#!python3
+while True:
+	try:
+		1/0
+	except:
+		pass
+```
+
+This will hang! Let's fix it: control-z to push to background -> `ps -ef` -> `kill`:
+
+```
+$ cat infinite_loop.py
+while True:
+    pass
+$ python infinite_loop.py &
+[2] 79723
+
+# if process id was not given look it up:
+
+$ ps -ef | grep infinite
+  501 79723 29862   0  3:02PM ttys005    0:06.61 /Library/Frameworks/Python.framework/Versions/3.10/Resources/Python.app/Contents/MacOS/Python infinite_loop.py
+  501 79739 29862   0  3:02PM ttys005    0:00.00 grep infinite
+$ kill 79723
+[2]  - terminated  python infinite_loop.py
+$ ps -ef | grep infinite
+  501 79763 29862   0  3:02PM ttys005    0:00.00 grep infinite
+```
+For really stubborn processes use `kill -9 <PID>`
+
+Bit beyond scope but you can change file / directory owner with `chown` and permissions with chmod +mask (3x rwx - read / write / executable - for 1) user / 2) group / 3) everybody)
 
 ## Unix stdin and stdout
 
@@ -148,6 +201,8 @@ pip freeze > requirements.txt
 To protect file overwriting: `set -o noclobber`
 
 Force overwriting file: `pip freeze >| requirements.txt`
+
+To append to an existing file: `>>`
 
 ## Unix pipes
 
@@ -316,6 +371,40 @@ The key's randomart image is:
 ```
 
 Now upload the .pub key to to your server's `authorized_keys` and you can ssh in without username + password.
+
+When managing multiple hosts it's convenient to use a `~/.ssh/config` file with entries like:
+
+```
+Host bob
+  HostName my-ip
+  Port 22
+  User bbelderbos
+  IdentityFile ~/.ssh/bob
+  IdentitiesOnly yes
+
+Host github.com
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/github
+...
+```
+
+And to copy files over: scp file.tar.gz bob:~/some/destination/dir (`bob` is the alias defined in SSH config).
+
+## Cronjobs
+
+Only applicable when you have a shared hosting space (for Heroku you can use Scheduler)
+
+```
+# ssh bob
+# cronjob -l
+# cronjob -e
+...
+```
+
+## Book
+
+Most is experience, go practice! One book I liked: [Data Science at the Command](https://datascienceatthecommandline.com)
 
 ## Have fun / Q&A
 
